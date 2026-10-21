@@ -32,6 +32,8 @@ export class RocketScene implements Scene {
   private bob = true
   private flameTarget = 0
   private reducedMotion = false
+  /** Height covered by the on-screen keyboard; the sky runs behind it. */
+  private inset = 0
 
   private app: Application
   private cells: number
@@ -51,12 +53,18 @@ export class RocketScene implements Scene {
     this.particles.density = on ? 0.35 : 1
   }
 
+  setBottomInset(px: number) {
+    this.inset = px
+    if (this.w > 0 && !this.launching) this.resize(this.w, this.h)
+  }
+
   resize(w: number, h: number) {
     this.w = w
     this.h = h
     this.stars.resize(w, h)
-    this.scale = Math.min(h * 0.62, w * 0.55) / 230
-    this.padY = h * 0.86
+    const usable = h - this.inset
+    this.scale = Math.min(usable * 0.62, w * 0.55) / 230
+    this.padY = usable * 0.86
     this.padX = w < 700 ? w * 0.3 : w * 0.32
     if (!this.launching) this.placeRocketOnPad()
     this.drawGround()
@@ -70,19 +78,22 @@ export class RocketScene implements Scene {
   }
 
   private drawGround() {
-    const { w, h } = this
+    const { w } = this
+    // Hills are shaped for the area above the keyboard and run down behind it.
+    const h = this.h - this.inset
+    const bottom = this.h
     const g = this.ground.clear()
     g.moveTo(0, h * 0.8)
       .bezierCurveTo(w * 0.2, h * 0.74, w * 0.35, h * 0.86, w * 0.55, h * 0.82)
       .bezierCurveTo(w * 0.75, h * 0.78, w * 0.9, h * 0.72, w, h * 0.78)
-      .lineTo(w, h)
-      .lineTo(0, h)
+      .lineTo(w, bottom)
+      .lineTo(0, bottom)
       .closePath()
       .fill({ color: 0x3b2f7a, alpha: 0.9 })
     g.moveTo(0, h * 0.9)
       .bezierCurveTo(w * 0.3, h * 0.84, w * 0.6, h * 0.92, w, h * 0.86)
-      .lineTo(w, h)
-      .lineTo(0, h)
+      .lineTo(w, bottom)
+      .lineTo(0, bottom)
       .closePath()
       .fill(0x2a2160)
     // Launch pad
@@ -178,7 +189,7 @@ export class RocketScene implements Scene {
     await this.tweens.to(1500, (t) => {
       root.y = lerp(startY, -this.h * 0.4, t)
       root.x = this.padX + (Math.random() - 0.5) * shake * (1 - t)
-      this.world.y = worldStart + this.h * 0.5 * t
+      this.world.y = worldStart + this.h * t
       this.stars.rush = 1400 * t
     }, ease.inCubic)
     this.engineOn = false
@@ -192,7 +203,7 @@ export class RocketScene implements Scene {
     const p = this.planet
     await this.tweens.to(1200, (t) => {
       this.stars.rush = 1400 * (1 - t)
-      p.y = lerp(-r * 2, this.h * 0.42, t)
+      p.y = lerp(-r * 2, this.h * 0.33, t)
     }, ease.outCubic)
     this.particles.burst({ x: p.x, y: p.y, count: 70, texture: this.textures.star, colors: RAINBOW, speed: [250, 750], gravity: 350, life: [900, 1600], scale: [0.5, 1.1], spin: true })
 
@@ -203,7 +214,7 @@ export class RocketScene implements Scene {
     this.flameTarget = 0.6
     this.engineOn = true
     await this.tweens.to(1000, (t) => {
-      root.y = lerp(this.h + 200, this.h * 0.45, t)
+      root.y = lerp(this.h + 200, this.h * 0.38, t)
     }, ease.outBack)
     this.engineOn = false
     this.flameTarget = 0.25
@@ -222,7 +233,7 @@ export class RocketScene implements Scene {
     const worldFrom = this.world.y
     const padRocketY = this.padY - 104 * this.scale
     await this.tweens.to(1100, (t) => {
-      if (p) p.y = lerp(this.h * 0.42, -this.h, t)
+      if (p) p.y = lerp(this.h * 0.33, -this.h, t)
       this.world.y = lerp(worldFrom, 0, t)
       root.x = lerp(fromX, this.padX, t)
       root.y = lerp(fromY, padRocketY, t)

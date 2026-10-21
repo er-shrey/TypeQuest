@@ -66,6 +66,7 @@ export function RocketGame({ profile, onHome, active, breakDue, onBreak }: {
   const [nudge, setNudge] = useState(0)
   const [sceneReady, setSceneReady] = useState(false)
   const timers = useRef<number[]>([])
+  const keyboardArea = useRef<HTMLDivElement>(null)
   const reducedMotion = profile.settings.reducedMotion
 
   const later = (ms: number, fn: () => void) => {
@@ -77,12 +78,22 @@ export function RocketGame({ profile, onHome, active, breakDue, onBreak }: {
     scene.current = s
     s.setReducedMotion(reducedMotion)
     s.setFilled(currentProfile().rocketCells)
+    s.setBottomInset(keyboardArea.current?.offsetHeight ?? 0)
     setSceneReady(true)
   }, [reducedMotion])
 
   useEffect(() => {
     scene.current?.setReducedMotion(reducedMotion)
   }, [reducedMotion])
+
+  // The sky fills the screen; the scene keeps the rocket clear of the keyboard.
+  useEffect(() => {
+    const el = keyboardArea.current
+    if (!el) return
+    const observer = new ResizeObserver(() => scene.current?.setBottomInset(el.offsetHeight))
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   // Ask for each new target once it appears.
   useEffect(() => {
@@ -249,7 +260,7 @@ export function RocketGame({ profile, onHome, active, breakDue, onBreak }: {
         </div>
       )}
 
-      <div className={`game-bottom ${phase === 'prompt' || phase === 'found' ? '' : 'hidden'}`}>
+      <div ref={keyboardArea} className={`game-bottom ${phase === 'prompt' || phase === 'found' ? '' : 'hidden'}`}>
         <OnScreenKeyboard target={phase === 'prompt' ? `Key${trial.target.letter}` : null} hint={trial.hint} flash={flash} />
       </div>
     </div>

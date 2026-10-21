@@ -25,6 +25,9 @@ html, body, #root {
   overscroll-behavior: none;
 }
 
+/* Fallback for pages taller than the screen (setup on small tablets), so no white shows below. */
+html { background: var(--night-2); }
+
 body {
   background: radial-gradient(120% 90% at 50% 110%, var(--night-3) 0%, var(--night-2) 45%, var(--night-1) 100%) fixed;
   color: #fff;
@@ -643,3 +646,8 @@ input, select { font: inherit; }
 .add-player { width: 100%; }
 .player-editor { width: 100%; max-width: none; box-shadow: none; }
 .player-editor h2 { margin: 0; }
+
+/* Rocket: the sky fills the screen and the keyboard floats over the hills. */
+.rocket .pixi-stage { position: absolute; inset: 0; }
+.rocket .game-bottom { position: absolute; left: 0; right: 0; bottom: 0; background: none; z-index: 3; }
+.rocket .countdown { place-items: center end; padding: 0 max(24px, 12vw) 14vh 0; }

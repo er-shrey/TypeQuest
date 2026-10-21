@@ -68,6 +68,7 @@ export function drawRocket(): RocketParts {
     .circle(5, -16, 4).fill(0xffffff)
     .circle(-4.5, -15.5, 2).fill(0x1d2440)
     .circle(5.5, -15.5, 2).fill(0x1d2440)
+    .moveTo(5 * Math.cos(0.2), -10 + 5 * Math.sin(0.2))
     .arc(0, -10, 5, 0.2, Math.PI - 0.2).stroke({ width: 2, color: 0x1d2440 })
     .circle(-6, -26, 5).fill({ color: 0xffffff, alpha: 0.5 })
 
@@ -91,6 +92,7 @@ export function drawPlanet(planet: Planet, r: number): Container {
   g.circle(r * 0.25, -r * 0.05, r * 0.09).fill(0x1d2440)
   g.circle(-r * 0.22, -r * 0.09, r * 0.03).fill(0xffffff)
   g.circle(r * 0.28, -r * 0.09, r * 0.03).fill(0xffffff)
+  g.moveTo(r * 0.2 * Math.cos(0.25), r * 0.12 + r * 0.2 * Math.sin(0.25))
   g.arc(0, r * 0.12, r * 0.2, 0.25, Math.PI - 0.25).stroke({ width: r * 0.06, color: 0x1d2440, cap: 'round' })
   g.circle(-r * 0.48, r * 0.15, r * 0.1).fill({ color: 0xff7aa8, alpha: 0.45 })
   g.circle(r * 0.48, r * 0.15, r * 0.1).fill({ color: 0xff7aa8, alpha: 0.45 })
