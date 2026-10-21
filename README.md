@@ -18,6 +18,24 @@
 - **Made for tablets.** Works in a desktop or Android tablet browser with a physical keyboard, in landscape or portrait, and offline once loaded.
 - **Private by design.** Everything stays on the device. No accounts, emails, ads or network calls.
 
+## Download for Android tablets
+
+**[Latest release](https://github.com/er-shrey/TypeQuest/releases/latest)**, or the direct link to the current build:
+
+```
+https://github.com/er-shrey/TypeQuest/releases/download/v0.1.0/TypeQuest-0.1.0.apk
+```
+
+Open the link on the tablet and tap the downloaded file. Android asks two one-time questions for apps from outside the Play Store: allow installs from your browser (or file manager), then tap past the Play Protect "unknown developer" warning (**More details → Install anyway**). Connect a physical keyboard and you're ready.
+
+Or install from a computer over USB, with USB debugging on:
+
+```bash
+adb install -r TypeQuest-0.1.0.apk
+```
+
+TypeQuest asks for no permissions at all, not even internet access.
+
 ## Rocket Launch
 
 Find letters to fuel the rocket. Five letters fill the tank, then it's countdown, blast-off and a new planet.
@@ -126,6 +144,36 @@ Regenerate the screenshots above. This starts the dev server, seeds demo players
 npm run screenshots
 ```
 
+## Android tablet app
+
+The same app, packaged for Android with [Capacitor](https://capacitorjs.com). It runs full screen and keeps the screen on. Esc on a physical keyboard is stopped from closing the game, and the Back gesture goes home instead of exiting. It requests no permissions at all, not even internet access.
+
+You need the Android SDK (Android Studio installs it) and JDK 21. Build a debug APK:
+
+```bash
+npm run android:apk
+```
+
+The APK is written to `android/app/build/outputs/apk/debug/app-debug.apk`. For a release build, signed and copied to `release/TypeQuest-<version>.apk` with its SHA-256 printed, bump `version` in `package.json` (the Android version is read from there) and run:
+
+```bash
+npm run android:release
+```
+
+To install the debug build on a tablet connected by USB with USB debugging on:
+
+```bash
+adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+Or open the project in Android Studio to run it from there:
+
+```bash
+npm run android:open
+```
+
+After changing web code, run `npm run android:sync` to copy the new build into the Android project. App icon and splash sources are in `assets/`. Regenerate them with `npx @capacitor/assets generate --android`.
+
 ## Docs
 
 - [docs/PRD.md](docs/PRD.md): product requirements, the source of truth
@@ -144,4 +192,4 @@ src/screens/   React screens
 scripts/       screenshot capture
 ```
 
-**Stack:** Vite, React and TypeScript, PixiJS (WebGL) for the game scenes, Web Audio and Web Speech for sound, and vite-plugin-pwa for offline use. An Android tablet app via Capacitor is planned once the web version is stable.
+**Stack:** Vite, React and TypeScript, PixiJS (WebGL) for the game scenes, Web Audio and Web Speech for sound, and vite-plugin-pwa for offline use. Capacitor for the Android tablet app.

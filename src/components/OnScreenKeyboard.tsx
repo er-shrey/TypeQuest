@@ -8,13 +8,16 @@ const ROWS: [string, string, number?][][] = [
   [...'ZXCVBNM'].map((c): [string, string] => [c, `Key${c}`]),
   [['space', 'Space', 6]],
 ]
-const ROW_OFFSET = [0, 0.25, 0.5, 0.95, 0]
+const WIDEST = 10
 
-/** Where a key sits across the keyboard (0 = left edge, 1 = right edge). */
+/**
+ * Where a key sits across the keyboard (0 = left edge, 1 = right edge).
+ * Rows are centred, so a row of n keys starts (WIDEST - n) / 2 keys in.
+ */
 export function keyColumn(code: string): number {
-  for (let r = 0; r < ROWS.length; r++) {
-    const i = ROWS[r].findIndex(([, c]) => c === code)
-    if (i >= 0) return Math.min(1, (ROW_OFFSET[r] + i + 0.5) / 10.5)
+  for (const row of ROWS) {
+    const i = row.findIndex(([, c]) => c === code)
+    if (i >= 0) return ((WIDEST - row.length) / 2 + i + 0.5) / WIDEST
   }
   return 0.5
 }
@@ -40,12 +43,11 @@ export function OnScreenKeyboard({ target, hint = 0, showDigits = false, flash }
   }, [flash])
 
   const rows = showDigits ? ROWS : ROWS.slice(1)
-  const offsets = showDigits ? ROW_OFFSET : ROW_OFFSET.slice(1)
 
   return (
     <div className="osk" aria-hidden="true">
       {rows.map((row, r) => (
-        <div className="osk-row" key={r} style={{ paddingLeft: `calc(var(--key) * ${offsets[r]})` }}>
+        <div className="osk-row" key={r}>
           {row.map(([label, code, width]) => {
             const isTarget = code === target && hint > 0
             const cls = [

@@ -232,7 +232,8 @@ input, select { font: inherit; }
 }
 
 /* on-screen keyboard */
-.osk { display: flex; flex-direction: column; gap: calc(var(--key) * 0.12); align-items: flex-start; }
+/* Rows are centred on one axis: a staggered left edge reads as a tilted keyboard. */
+.osk { display: flex; flex-direction: column; gap: calc(var(--key) * 0.12); align-items: center; }
 .osk-row { display: flex; gap: calc(var(--key) * 0.12); }
 .osk-key {
   position: relative;
@@ -249,7 +250,6 @@ input, select { font: inherit; }
   transition: transform 0.08s, box-shadow 0.08s, background 0.2s;
 }
 .osk-space { justify-self: center; }
-.osk-row:last-child { align-self: center; }
 .osk-target {
   background: linear-gradient(180deg, #fff6b8, var(--yellow));
   outline: calc(var(--key) * 0.08) solid #fff;

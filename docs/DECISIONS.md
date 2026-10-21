@@ -12,12 +12,11 @@ choices the PRD left open, and why. Add to it whenever an ambiguous decision is 
 - **Web Audio synthesis** for sound effects (no audio files to download, tiny,
   instant) and the **Web Speech API** for spoken letter names.
 - **vite-plugin-pwa** so the app works offline after first load and can be installed.
-- **Capacitor (later milestone)** wraps the same build as a real Android tablet
-  app. This gives us what a browser can't: catching the Android Back gesture
-  (an external keyboard's Esc key *is* Back on Android), immersive full screen,
-  keep-awake, and Play Store distribution. Nothing in the code depends on URL
-  routing or a web server, and `base` is relative, so the build drops straight
-  into a Capacitor WebView.
+- **Capacitor 8** wraps the same build as a real Android tablet app (`android/`).
+  This gives us what a browser can't: catching the Android Back gesture,
+  immersive full screen, keep-awake, and Play Store distribution. Nothing in the
+  code depends on URL routing or a web server, and `base` is relative, so the
+  build drops straight into the Capacitor WebView.
 
 Considered and rejected for now: **Flutter** (excellent on Android, but its web
 build is heavy and slow to start, and the PRD is web-first); **a native Android
@@ -67,6 +66,23 @@ chance, and it needs no account or PIN to forget.
 During play the app calls `preventDefault` on keys that would scroll or
 navigate the page (Space, Backspace, Tab, arrows, Enter, `/`, `'`). Shortcuts
 with Ctrl/Alt/Meta are left alone, as the PRD requires. A web page cannot block
-the Home key, app switching or Esc-as-Back on Android; the parent setup screen
-recommends Android **screen pinning** for that, and the Capacitor app will
-handle Back itself.
+the Home key or app switching; the parent setup screen recommends Android
+**screen pinning** for that.
+
+In the Android app (`MainActivity.java`), Esc from a physical keyboard is handed
+to the page and stopped there, because Android would otherwise turn it into Back
+and close the game. The Back gesture itself returns to the home screen and never
+exits the app.
+
+## D8 — Android app specifics
+
+- **No permissions at all**, not even `INTERNET`: the app can't reach the network,
+  which is the simplest privacy promise to make to parents.
+- **Speech:** Android's WebView has no `speechSynthesis`, so the app speaks
+  through Android's own text-to-speech (`@capacitor-community/text-to-speech`).
+- **Full screen and screen-on:** system bars hidden (swipe from an edge to show
+  them briefly), and the screen doesn't dim while the app is open.
+- **No service worker in the app:** files ship inside the APK, and a cached
+  worker could keep serving an old version after an update. It's registered on
+  the web only.
+- **App id:** `io.github.ershrey.typequest`.

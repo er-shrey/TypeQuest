@@ -1,14 +1,22 @@
+import { Capacitor } from '@capacitor/core'
+import { QueueStrategy, TextToSpeech } from '@capacitor-community/text-to-speech'
 import { DIGIT_NAMES, LETTER_NAMES } from '../engine/letters'
 
-// Spoken prompts through the browser's speech engine (DECISIONS D4). Swapping
-// to recorded clips later only means changing this file.
+// Spoken prompts through the browser's speech engine, or Android's own
+// text-to-speech in the app, since Android WebView has no speechSynthesis
+// (DECISIONS D4). Swapping to recorded clips later only means changing this file.
+
+const native = Capacitor.isNativePlatform()
 
 let enabled = true
 let voice: SpeechSynthesisVoice | null = null
 
 export function setSpeechEnabled(on: boolean) {
   enabled = on
-  if (!on) window.speechSynthesis?.cancel()
+  if (!on) {
+    if (native) void TextToSpeech.stop().catch(() => {})
+    else window.speechSynthesis?.cancel()
+  }
 }
 
 function pickVoice() {
@@ -22,12 +30,16 @@ function pickVoice() {
     null
 }
 
-if (typeof window !== 'undefined' && window.speechSynthesis) {
+if (!native && typeof window !== 'undefined' && window.speechSynthesis) {
   pickVoice()
   window.speechSynthesis.addEventListener?.('voiceschanged', pickVoice)
 }
 
 export function speak(text: string) {
+  if (native) {
+    if (enabled) void TextToSpeech.speak({ text, lang: 'en-US', rate: 0.9, pitch: 1.25, queueStrategy: QueueStrategy.Flush }).catch(() => {})
+    return
+  }
   const synth = typeof window !== 'undefined' ? window.speechSynthesis : undefined
   if (!enabled || !synth) return
   synth.cancel()

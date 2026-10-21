@@ -15,6 +15,18 @@ export interface KeyPress {
 const SWALLOWED = new Set([' ', 'Backspace', 'Tab', 'Enter', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', '/', "'", 'PageUp', 'PageDown', 'Home', 'End'])
 
 /**
+ * Android WebView can leave KeyboardEvent.code empty (seen with injected and some
+ * hardware key events), so derive the key position from the character instead.
+ */
+export function codeFor(key: string, code: string): string {
+  if (code) return code
+  if (/^[a-z]$/i.test(key)) return `Key${key.toUpperCase()}`
+  if (/^[0-9]$/.test(key)) return `Digit${key}`
+  if (key === ' ') return 'Space'
+  return ''
+}
+
+/**
  * Listens to the physical keyboard on the whole window — not a text field, so
  * Android never pops up its on-screen keyboard or routes keys through an IME.
  */
@@ -35,7 +47,7 @@ export function useKeyPresses(onPress: (press: KeyPress) => void, enabled = true
         letter,
         digit: /^[0-9]$/.test(e.key) ? e.key : null,
         key: e.key,
-        code: e.code,
+        code: codeFor(e.key, e.code),
         repeat: e.repeat,
       })
     }

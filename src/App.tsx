@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import { App as NativeApp } from '@capacitor/app'
+import { Capacitor } from '@capacitor/core'
 import { setSoundEnabled } from './audio/sfx'
 import { setSpeechEnabled } from './audio/speech'
 import { FocusOverlay } from './components/common'
@@ -76,7 +78,12 @@ export default function App() {
       setScreen('home')
     }
     window.addEventListener('popstate', onPop)
-    return () => window.removeEventListener('popstate', onPop)
+    // Android's Back gesture: with a listener, Capacitor no longer closes the app.
+    const back = Capacitor.isNativePlatform() ? NativeApp.addListener('backButton', onPop) : null
+    return () => {
+      window.removeEventListener('popstate', onPop)
+      void back?.then((h) => h.remove())
+    }
   }, [])
 
   const inGame = screen === 'rocket' || screen === 'explore'

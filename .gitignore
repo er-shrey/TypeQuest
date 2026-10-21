@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Release APKs, attached to GitHub Releases instead of committed
+release/
