@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { PlayerForm } from '../components/PlayerForm'
+import { cellsPerRound, DIFFICULTY, type Difficulty } from '../engine/config'
+import { currentStage } from '../engine/rewards'
 import { INTRO_ORDER, type CaseStage, type LetterCase } from '../engine/letters'
 import { masteryState, recentAccuracy, type MasteryState } from '../engine/skills'
 import { getSkill } from '../engine/targets'
@@ -32,6 +34,11 @@ const CASE_LABEL: Record<CaseStage, string> = {
 }
 
 const STAGE_LABEL = { explorer: 'Keyboard Explorer', adventurer: 'Letter Adventurer' }
+
+function stageSummary(profile: Profile) {
+  const s = currentStage(profile.rewards)
+  return s.allDone ? `all ${s.total} stages done, collecting bonus stars` : `stage ${s.stage} of ${s.total} (${s.galaxy.name})`
+}
 
 function formatAgo(at: number | null) {
   if (!at) return '—'
@@ -99,7 +106,10 @@ function ProgressView({ profile }: { profile: Profile }) {
       <p className="summary">
         {met.length === 0
           ? `${profile.name} hasn't started on ${kind} letters yet.`
-          : `${profile.name} has met ${met.length} ${kind} letters and knows ${known.length} of them well. Planets visited: ${profile.rewards.planets.length}.`}
+          : `${profile.name} has met ${met.length} ${kind} letters and knows ${known.length} of them well.`}
+      </p>
+      <p className="summary">
+        Rocket Launch: {stageSummary(profile)} · Difficulty: {DIFFICULTY[profile.settings.difficulty].label}
       </p>
       <p className="muted small">"Knows it well" means found on the first try without help, on at least two different days. These are gentle guides, not test scores.</p>
 
@@ -150,6 +160,20 @@ function SettingsView({ profile }: { profile: Profile }) {
       <Toggle label="Sound effects" checked={profile.settings.sound} onChange={(v) => setSetting('sound', v)} />
       <Toggle label="Spoken instructions" checked={profile.settings.speech} onChange={(v) => setSetting('speech', v)} />
       <Toggle label="Calmer visuals (less motion)" checked={profile.settings.reducedMotion} onChange={(v) => setSetting('reducedMotion', v)} />
+
+      <div className="row difficulty-row">
+        <span>Difficulty</span>
+        <div className="segmented" role="radiogroup" aria-label="Difficulty">
+          {(Object.keys(DIFFICULTY) as Difficulty[]).map((d) => (
+            <button key={d} role="radio" aria-checked={profile.settings.difficulty === d} className={profile.settings.difficulty === d ? 'active' : ''} onClick={() => setSetting('difficulty', d)}>
+              {DIFFICULTY[d].label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <p className="muted small">
+        {DIFFICULTY[profile.settings.difficulty].description}. {profile.name} needs {cellsPerRound(profile.settings.difficulty, currentStage(profile.rewards).galaxyIndex)} letters to fuel the rocket in {currentStage(profile.rewards).galaxy.name}, and each new galaxy adds one. There are never timers or penalties.
+      </p>
 
       <label className="row">
         <span>Suggest a break after</span>

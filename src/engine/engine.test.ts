@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { displayLetter, letterFromKey, skillId } from './letters'
 import { emptySkill, hintAfterMisses, masteryState, recordTrial, startingHint, type KeySkill } from './skills'
 import { activeLetters, advance, newProgress, pickTarget, type LearnerProgress } from './targets'
-import { awardRound, PLANETS } from './rewards'
+import { awardRound, currentStage, GALAXIES, PLANETS } from './rewards'
+import { cellsPerRound, DIFFICULTY } from './config'
 
 const DAY = 24 * 60 * 60 * 1000
 const T0 = new Date(2026, 9, 1, 10).getTime()
@@ -130,14 +131,40 @@ describe('targets', () => {
   })
 })
 
-describe('rewards', () => {
-  it('unlocks planets in a fixed order, then bonus stars', () => {
+describe('rewards and stages', () => {
+  it('unlocks every stage in a fixed order across galaxies, then bonus stars', () => {
     let rewards = { planets: [] as string[], bonusStars: 0 }
-    for (const planet of PLANETS) {
+    expect(PLANETS).toHaveLength(24)
+    PLANETS.forEach((planet, i) => {
+      expect(currentStage(rewards)).toMatchObject({ stage: i + 1, planet, allDone: false })
       const r = awardRound(rewards)
-      expect(r.reward).toEqual({ kind: 'planet', planet })
+      expect(r.reward).toMatchObject({ kind: 'planet', planet })
+      rewards = r.rewards
+    })
+    expect(currentStage(rewards).allDone).toBe(true)
+    expect(awardRound(rewards).reward.kind).toBe('star')
+  })
+
+  it('announces a finished galaxy on its last planet only', () => {
+    let rewards = { planets: [] as string[], bonusStars: 0 }
+    const done: string[] = []
+    for (let i = 0; i < PLANETS.length; i++) {
+      const r = awardRound(rewards)
+      if (r.reward.kind === 'planet' && r.reward.galaxyComplete) done.push(`${i + 1}:${r.reward.galaxyComplete.id}`)
       rewards = r.rewards
     }
-    expect(awardRound(rewards).reward.kind).toBe('star')
+    expect(done).toEqual(GALAXIES.map((g, i) => `${(i + 1) * 8}:${g.id}`))
+  })
+
+  it('asks for one more fuel cell per galaxy, set by difficulty', () => {
+    expect([0, 1, 2].map((g) => cellsPerRound('gentle', g))).toEqual([4, 5, 6])
+    expect([0, 1, 2].map((g) => cellsPerRound('normal', g))).toEqual([5, 6, 7])
+    expect([0, 1, 2].map((g) => cellsPerRound('challenge', g))).toEqual([6, 7, 8])
+  })
+
+  it('brings hints sooner on Gentle and later on Challenge', () => {
+    expect(hintAfterMisses(0, 1, DIFFICULTY.gentle.missesPerLevel)).toBe(1)
+    expect(hintAfterMisses(0, 2, DIFFICULTY.normal.missesPerLevel)).toBe(1)
+    expect(hintAfterMisses(0, 2, DIFFICULTY.challenge.missesPerLevel)).toBe(0)
   })
 })

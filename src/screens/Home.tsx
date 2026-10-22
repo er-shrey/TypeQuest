@@ -4,14 +4,15 @@ import { sfx, unlockAudio } from '../audio/sfx'
 import { Pip } from '../components/Pip'
 import { PlanetSticker } from '../components/PlanetSticker'
 import { Screen } from '../components/common'
-import { nextPlanet, PLANETS } from '../engine/rewards'
+import { currentStage, PLANETS } from '../engine/rewards'
 import type { Profile } from '../storage/store'
 
 export type Destination = 'rocket' | 'explore' | 'collection' | 'parent'
 
 export function Home({ profile, onGo, onSwitchPlayer }: { profile: Profile; onGo: (d: Destination) => void; onSwitchPlayer?: () => void }) {
-  const planet = nextPlanet(profile.rewards)
-  const allCollected = profile.rewards.planets.length >= PLANETS.length
+  const stage = currentStage(profile.rewards)
+  const planet = stage.planet
+  const allCollected = stage.allDone
   const resuming = profile.rocketCells > 0
 
   useEffect(() => {
@@ -48,7 +49,7 @@ export function Home({ profile, onGo, onSwitchPlayer }: { profile: Profile; onGo
             <PlanetSticker planet={planet} size={96} />
           </span>
           <span className="card-title">{resuming ? 'Keep flying!' : 'Rocket Launch'}</span>
-          <span className="card-sub">{allCollected ? 'Collect bonus stars' : `Fly to ${planet.name}`}</span>
+          <span className="card-sub">{allCollected ? 'Collect bonus stars' : `Stage ${stage.stage} · Fly to ${planet.name}`}</span>
         </button>
 
         <button className="card card-explore" onClick={() => go('explore')}>

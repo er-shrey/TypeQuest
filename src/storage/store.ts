@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react'
-import { POOL } from '../engine/config'
+import { POOL, type Difficulty } from '../engine/config'
 import { newProgress, type LearnerProgress } from '../engine/targets'
 import type { Rewards } from '../engine/rewards'
 
@@ -11,6 +11,7 @@ export interface Settings {
   reducedMotion: boolean
   /** Minutes before a gentle break screen; 0 = no limit. */
   sessionLimitMin: number
+  difficulty: Difficulty
 }
 
 export interface ActivityEntry {
@@ -31,6 +32,8 @@ export interface Profile {
   activity: ActivityEntry[]
   /** Fuel cells filled in an unfinished rocket round, so a reload resumes it. */
   rocketCells: number
+  /** After a session limit: rest until this time, so closing and reopening doesn't skip the break. */
+  restUntil?: number
 }
 
 export interface AppData {
@@ -42,7 +45,7 @@ export interface AppData {
 
 const KEY = 'typequest:v1'
 
-export const DEFAULT_SETTINGS: Settings = { sound: true, speech: true, reducedMotion: false, sessionLimitMin: 15 }
+export const DEFAULT_SETTINGS: Settings = { sound: true, speech: true, reducedMotion: false, sessionLimitMin: 15, difficulty: 'normal' }
 
 function emptyData(): AppData {
   return { version: 1, activeProfileId: null, profiles: {} }

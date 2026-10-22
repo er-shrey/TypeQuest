@@ -32,6 +32,46 @@ export const POOL = {
 /** Mastered letters in the current case stage before moving to the next. */
 export const CASE_STAGE_ADVANCE_AFTER = 10
 
-export const ROCKET = {
-  cellsPerRound: 5,
-} as const
+export type Difficulty = 'gentle' | 'normal' | 'challenge'
+
+/** Set per child by a parent. Changes pacing and help, never adds pressure (no timers or penalties). */
+export const DIFFICULTY: Record<Difficulty, {
+  label: string
+  description: string
+  /** Fuel cells per rocket round in the first galaxy; each later galaxy adds one. */
+  baseCells: number
+  missesPerLevel: number
+  idleMs: number
+  growWhenReady: number
+}> = {
+  gentle: {
+    label: 'Gentle',
+    description: 'Shorter rounds, and help arrives sooner',
+    baseCells: 4,
+    missesPerLevel: 1,
+    idleMs: 5000,
+    growWhenReady: 0.85,
+  },
+  normal: {
+    label: 'Normal',
+    description: 'The default pace',
+    baseCells: 5,
+    missesPerLevel: HINTS.missesPerLevel,
+    idleMs: HINTS.idleMs,
+    growWhenReady: POOL.growWhenReady,
+  },
+  challenge: {
+    label: 'Challenge',
+    description: 'Longer rounds, more time before hints, new letters sooner',
+    baseCells: 6,
+    missesPerLevel: 3,
+    idleMs: 15000,
+    growWhenReady: 0.6,
+  },
+}
+
+export const MAX_CELLS = 8
+
+export function cellsPerRound(difficulty: Difficulty, galaxyIndex: number): number {
+  return Math.min(MAX_CELLS, DIFFICULTY[difficulty].baseCells + galaxyIndex)
+}

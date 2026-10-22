@@ -14,7 +14,7 @@ import { ParentArea, type ParentTab } from './screens/ParentArea'
 import { ParentGate } from './screens/ParentGate'
 import { ProfilePicker } from './screens/ProfilePicker'
 import { RocketGame } from './screens/RocketGame'
-import { getData, useAppData, useProfile } from './storage/store'
+import { getData, updateProfile, useAppData, useProfile } from './storage/store'
 
 type ScreenName = 'home' | 'rocket' | 'explore' | 'collection' | 'parent'
 type GateFor = 'parent' | 'continue' | null
@@ -56,18 +56,27 @@ export default function App() {
     document.documentElement.classList.toggle('reduced-motion', settings.reducedMotion)
   }, [settings])
 
-  // Gentle session limit set by the parent (PRD FR-012, FR-020).
+  // Gentle session limit set by the parent (PRD FR-012, FR-020). When it's
+  // reached, the rest lasts as long as the limit, and survives closing the app.
   const limit = settings?.sessionLimitMin ?? 0
+  const profileId = profile?.id
   useEffect(() => {
     if (!limit) {
       setBreakDue(false)
       return
     }
-    const check = () => setBreakDue(Date.now() - sessionStart.current >= limit * 60_000)
+    const check = () => {
+      const now = Date.now()
+      const restUntil = getData().profiles[getData().activeProfileId ?? '']?.restUntil ?? 0
+      if (restUntil > now) return setBreakDue(true)
+      const due = now - sessionStart.current >= limit * 60_000 && restUntil < sessionStart.current
+      if (due) updateProfile((p) => ({ ...p, restUntil: now + limit * 60_000 }))
+      setBreakDue(due)
+    }
     check()
     const id = setInterval(check, 10_000)
     return () => clearInterval(id)
-  }, [limit])
+  }, [limit, profileId])
 
   // The browser Back button (and Esc-as-Back on some tablets) returns home instead of leaving the app.
   useEffect(() => {
@@ -108,6 +117,7 @@ export default function App() {
     }
     else {
       sessionStart.current = Date.now()
+      updateProfile((p) => ({ ...p, restUntil: undefined }))
       setBreakDue(false)
       setScreen('home')
     }

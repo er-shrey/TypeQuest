@@ -4,9 +4,9 @@ import { sfx } from '../audio/sfx'
 import { HomeButton } from '../components/common'
 import { OnScreenKeyboard } from '../components/OnScreenKeyboard'
 import { Pip, type PipMood } from '../components/Pip'
-import { HINTS, ROCKET } from '../engine/config'
+import { cellsPerRound, DIFFICULTY, HINTS } from '../engine/config'
 import { displayLetter } from '../engine/letters'
-import { awardRound, nextPlanet, type RoundReward } from '../engine/rewards'
+import { awardRound, currentStage, galaxyOf, GALAXIES, nextPlanet, type RoundReward } from '../engine/rewards'
 import { hintAfterMisses, recordTrial, startingHint } from '../engine/skills'
 import { advance, getSkill, pickTarget, type Target } from '../engine/targets'
 import { useKeyPresses, type KeyPress } from '../input/useKeyPresses'
@@ -68,6 +68,11 @@ export function RocketGame({ profile, onHome, active, breakDue, onBreak }: {
   const timers = useRef<number[]>([])
   const keyboardArea = useRef<HTMLDivElement>(null)
   const reducedMotion = profile.settings.reducedMotion
+  const pace = DIFFICULTY[profile.settings.difficulty]
+  const stage = currentStage(profile.rewards)
+  const cells = cellsPerRound(profile.settings.difficulty, stage.galaxyIndex)
+  const cellsRef = useRef(cells)
+  cellsRef.current = cells
 
   const later = (ms: number, fn: () => void) => {
     timers.current.push(window.setTimeout(fn, ms))
@@ -77,6 +82,7 @@ export function RocketGame({ profile, onHome, active, breakDue, onBreak }: {
   const onReady = useCallback((s: RocketScene) => {
     scene.current = s
     s.setReducedMotion(reducedMotion)
+    s.setCells(cellsRef.current)
     s.setFilled(currentProfile().rocketCells)
     s.setBottomInset(keyboardArea.current?.offsetHeight ?? 0)
     setSceneReady(true)
@@ -85,6 +91,16 @@ export function RocketGame({ profile, onHome, active, breakDue, onBreak }: {
   useEffect(() => {
     scene.current?.setReducedMotion(reducedMotion)
   }, [reducedMotion])
+
+  useEffect(() => {
+    scene.current?.setCells(cells)
+  }, [cells])
+
+  // Hills follow the galaxy, but only once the rocket is back on a launch pad there.
+  const padGalaxy = phase === 'reward' || phase === 'flying' ? null : stage.galaxy
+  useEffect(() => {
+    if (padGalaxy && sceneReady) scene.current?.setHills(padGalaxy.hills)
+  }, [padGalaxy, sceneReady])
 
   // The sky fills the screen; the scene keeps the rocket clear of the keyboard.
   useEffect(() => {
@@ -110,9 +126,9 @@ export function RocketGame({ profile, onHome, active, breakDue, onBreak }: {
       setTrial((tr) => ({ ...tr, hint: tr.hint + 1, maxHint: Math.max(tr.maxHint, tr.hint + 1), idleBumped: true }))
       setPip('curious')
       askFor(trial.target)
-    }, HINTS.idleMs)
+    }, pace.idleMs)
     return () => clearTimeout(t)
-  }, [phase, active, trial, nudge])
+  }, [phase, active, trial, nudge, pace.idleMs])
 
   const nextTarget = () => {
     setTrial((tr) => newTrial(tr.target))
@@ -142,7 +158,7 @@ export function RocketGame({ profile, onHome, active, breakDue, onBreak }: {
     let end: RoundEnd | null = null
     updateProfile((p) => {
       const { rewards, reward } = awardRound(p.rewards)
-      const update = advance(p.progress)
+      const update = advance(p.progress, DIFFICULTY[p.settings.difficulty].growWhenReady)
       end = { reward, newLetters: update.newLetters }
       return { ...p, rewards, progress: update.progress, rocketCells: 0 }
     })
@@ -158,14 +174,14 @@ export function RocketGame({ profile, onHome, active, breakDue, onBreak }: {
 
   // A full tank left over from an interrupted round: launch straight away.
   useEffect(() => {
-    if (sceneReady && currentProfile().rocketCells >= ROCKET.cellsPerRound) {
+    if (sceneReady && currentProfile().rocketCells >= cellsRef.current) {
       setPhase('found')
       later(600, () => void launch())
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sceneReady])
 
-  const flyAgain = async () => {
+  const nextStage = async () => {
     sfx.tap()
     setRoundEnd(null)
     setPhase('found')
@@ -178,11 +194,11 @@ export function RocketGame({ profile, onHome, active, breakDue, onBreak }: {
     setNudge((n) => n + 1)
 
     if (press.letter === trial.target.letter) {
-      const cells = currentProfile().rocketCells + 1
+      const filled = currentProfile().rocketCells + 1
       updateProfile((p) => {
         const skill = getSkill(p.progress, trial.target.letter, trial.target.letterCase)
         const updated = recordTrial(skill, { ...trial.target, misses: trial.misses, wrongKeys: trial.wrongKeys, maxHint: trial.maxHint, at: Date.now() })
-        return { ...p, rocketCells: cells, progress: { ...p.progress, skills: { ...p.progress.skills, [updated.id]: updated } } }
+        return { ...p, rocketCells: filled, progress: { ...p.progress, skills: { ...p.progress.skills, [updated.id]: updated } } }
       })
       setFlash({ code: press.code, kind: 'press', id: Date.now() })
       scene.current?.fillCell()
@@ -190,14 +206,14 @@ export function RocketGame({ profile, onHome, active, breakDue, onBreak }: {
       setPip('cheer')
       setMessage('You found it!')
       setPhase('found')
-      if (cells >= ROCKET.cellsPerRound) later(900, () => void launch())
+      if (filled >= cellsRef.current) later(900, () => void launch())
       else later(1100, nextTarget)
       return
     }
 
     // A gentle nudge, never a penalty. Fuel is never taken away.
     const misses = trial.misses + 1
-    const hint = Math.max(trial.hint, hintAfterMisses(trial.start, misses))
+    const hint = Math.max(trial.hint, hintAfterMisses(trial.start, misses, pace.missesPerLevel))
     setTrial({ ...trial, misses, hint, maxHint: Math.max(trial.maxHint, hint), wrongKeys: [...trial.wrongKeys, press.letter] })
     setFlash({ code: press.code, kind: 'wrong', id: Date.now() })
     scene.current?.wobble()
@@ -211,14 +227,23 @@ export function RocketGame({ profile, onHome, active, breakDue, onBreak }: {
 
   const shown = displayLetter(trial.target.letter, trial.target.letterCase)
   const reward = roundEnd?.reward
+  // Keep the sky of the galaxy just flown through until the child moves on.
+  const skyGalaxy = reward?.kind === 'planet' ? galaxyOf(reward.planet.id).galaxy : stage.galaxy
+  const [sky1, sky2, sky3] = skyGalaxy.sky
+  const nextGalaxy = reward?.kind === 'planet' && reward.galaxyComplete ? GALAXIES[galaxyOf(reward.planet.id).index + 1] : undefined
 
   return (
-    <div className="game rocket">
+    <div className="game rocket" style={{ background: `radial-gradient(120% 90% at 50% 110%, ${sky3} 0%, ${sky2} 45%, ${sky1} 100%)` }}>
       <div className="game-top">
         <HomeButton onClick={onHome} />
+        {phase !== 'reward' && (
+          <span className="stage-chip">
+            {stage.allDone ? 'Bonus stars' : `Stage ${stage.stage} of ${stage.total}`} · {stage.galaxy.name}
+          </span>
+        )}
       </div>
 
-      <PixiStage create={(app) => new RocketScene(app, ROCKET.cellsPerRound)} onReady={onReady} />
+      <PixiStage create={(app) => new RocketScene(app, cellsRef.current)} onReady={onReady} />
 
       {(phase === 'prompt' || phase === 'found') && (
         <div className="target-area">
@@ -240,7 +265,13 @@ export function RocketGame({ profile, onHome, active, breakDue, onBreak }: {
           <div className="reward-card">
             {reward.kind === 'star' && <div className="bonus-star">⭐</div>}
             <h2>{reward.kind === 'planet' ? `You reached ${reward.planet.name}!` : 'Bonus star!'}</h2>
-            <p>{reward.kind === 'planet' ? 'A new planet sticker for your collection.' : 'You have visited every planet!'}</p>
+            <p>
+              {reward.kind === 'star'
+                ? 'You have visited every planet!'
+                : reward.galaxyComplete
+                  ? `You explored all of ${reward.galaxyComplete.name}!${nextGalaxy ? ` Next stop: ${nextGalaxy.name}.` : ''}`
+                  : 'A new planet sticker for your collection.'}
+            </p>
             {roundEnd!.newLetters.length > 0 && (
               <p className="new-letter">
                 New letter to discover: <strong>{roundEnd!.newLetters.map((t) => displayLetter(t.letter, t.letterCase)).join(' ')}</strong>
@@ -251,7 +282,9 @@ export function RocketGame({ profile, onHome, active, breakDue, onBreak }: {
                 <button className="big-btn primary" onClick={onBreak}>Time for a rest 😴</button>
               ) : (
                 <>
-                  <button className="big-btn primary" onClick={flyAgain}>Fly again 🚀</button>
+                  <button className="big-btn primary next-stage" onClick={nextStage}>
+                    {stage.allDone ? 'Find more stars ⭐' : <>Next: {stage.planet.name} 🚀<small>Stage {stage.stage}</small></>}
+                  </button>
                   <button className="big-btn" onClick={onHome}>Home</button>
                 </>
               )}

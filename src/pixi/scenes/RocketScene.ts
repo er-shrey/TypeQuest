@@ -34,6 +34,7 @@ export class RocketScene implements Scene {
   private reducedMotion = false
   /** Height covered by the on-screen keyboard; the sky runs behind it. */
   private inset = 0
+  private hills: [number, number] = [0x3b2f7a, 0x2a2160]
 
   private app: Application
   private cells: number
@@ -51,6 +52,12 @@ export class RocketScene implements Scene {
   setReducedMotion(on: boolean) {
     this.reducedMotion = on
     this.particles.density = on ? 0.35 : 1
+  }
+
+  setHills(colors: [number, number]) {
+    if (colors[0] === this.hills[0] && colors[1] === this.hills[1]) return
+    this.hills = colors
+    if (this.w > 0) this.drawGround()
   }
 
   setBottomInset(px: number) {
@@ -89,13 +96,13 @@ export class RocketScene implements Scene {
       .lineTo(w, bottom)
       .lineTo(0, bottom)
       .closePath()
-      .fill({ color: 0x3b2f7a, alpha: 0.9 })
+      .fill({ color: this.hills[0], alpha: 0.9 })
     g.moveTo(0, h * 0.9)
       .bezierCurveTo(w * 0.3, h * 0.84, w * 0.6, h * 0.92, w, h * 0.86)
       .lineTo(w, bottom)
       .lineTo(0, bottom)
       .closePath()
-      .fill(0x2a2160)
+      .fill(this.hills[1])
     // Launch pad
     const s = this.scale
     g.roundRect(this.padX - 80 * s, this.padY - 4 * s, 160 * s, 18 * s, 8 * s).fill(0x8a93b8)
@@ -132,6 +139,14 @@ export class RocketScene implements Scene {
       )
       if (on) g.roundRect(x + 8 * s, cy + 6 * s, (width - 16 * s) * 0.35, cellH - 12 * s, 5 * s).fill({ color: 0xffffff, alpha: 0.35 })
     }
+  }
+
+  /** Tank size for this round: it grows with each galaxy and with difficulty. */
+  setCells(n: number) {
+    if (n === this.cells) return
+    this.cells = n
+    this.filled = Math.min(this.filled, n)
+    this.drawGauge()
   }
 
   /** Restores the gauge after a reload mid-round, without effects. */

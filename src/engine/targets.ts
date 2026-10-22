@@ -75,7 +75,7 @@ export interface ProgressUpdate {
  * Grows the letter pool when most active letters are known, and moves to the
  * next case stage when enough letters are mastered. Call after each round.
  */
-export function advance(progress: LearnerProgress): ProgressUpdate {
+export function advance(progress: LearnerProgress, growWhenReady: number = POOL.growWhenReady): ProgressUpdate {
   const poolSize = { ...progress.poolSize }
   const newLetters: Target[] = []
 
@@ -85,7 +85,7 @@ export function advance(progress: LearnerProgress): ProgressUpdate {
       const state = masteryState(getSkill(progress, l, letterCase))
       return state === 'practicing' || state === 'mastered'
     }).length
-    if (known / letters.length >= POOL.growWhenReady && poolSize[letterCase] < INTRO_ORDER.length) {
+    if (known / letters.length >= growWhenReady && poolSize[letterCase] < INTRO_ORDER.length) {
       newLetters.push({ letter: INTRO_ORDER[poolSize[letterCase]], letterCase })
       poolSize[letterCase] += 1
     }

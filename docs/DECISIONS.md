@@ -86,3 +86,18 @@ exits the app.
   worker could keep serving an old version after an update. It's registered on
   the web only.
 - **App id:** `io.github.ershrey.typequest`.
+
+## D9 — Stages, difficulty and the break
+
+- **Stages are planets.** 24 stages in 3 galaxies, each galaxy asking for one
+  more fuel cell, so rounds lengthen gently as a child progresses. The reward
+  button names the next stage ("Next: Ringo") so it never looks like a replay.
+- **Difficulty is per child** (Gentle, Normal, Challenge) and only changes the
+  round length, how quickly hints arrive and how soon new letters join. The
+  table is in `engine/config.ts` and in the rocket spec.
+- **The break can't be skipped by closing the app.** When the session limit is
+  reached, the child sees the break screen with a **Close TypeQuest** button
+  (it exits the Android app; a browser tab only closes if the browser allows
+  it). The rest lasts as long as the limit and is saved, so reopening the app
+  during it shows the break screen again. A grown-up can end it early through
+  the sum gate.

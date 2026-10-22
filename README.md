@@ -23,7 +23,7 @@
 **[Latest release](https://github.com/er-shrey/TypeQuest/releases/latest)**, or the direct link to the current build:
 
 ```
-https://github.com/er-shrey/TypeQuest/releases/download/v0.1.0/TypeQuest-0.1.0.apk
+https://github.com/er-shrey/TypeQuest/releases/download/v0.2.0/TypeQuest-0.2.0.apk
 ```
 
 Open the link on the tablet and tap the downloaded file. Android asks two one-time questions for apps from outside the Play Store: allow installs from your browser (or file manager), then tap past the Play Protect "unknown developer" warning (**More details → Install anyway**). Connect a physical keyboard and you're ready.
@@ -31,7 +31,7 @@ Open the link on the tablet and tap the downloaded file. Android asks two one-ti
 Or install from a computer over USB, with USB debugging on:
 
 ```bash
-adb install -r TypeQuest-0.1.0.apk
+adb install -r TypeQuest-0.2.0.apk
 ```
 
 TypeQuest asks for no permissions at all, not even internet access.
@@ -58,11 +58,11 @@ Find letters to fuel the rocket. Five letters fill the tank, then it's countdown
     <td><b>Blast off!</b> Engine flame, smoke and rushing stars.</td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/rocket-reward.png" alt="The rocket visits a smiling blue planet called Bubble; a card offers Fly again or Home" /></td>
+    <td><img src="docs/screenshots/rocket-reward.png" alt="The rocket visits a smiling blue planet called Bubble; a card offers Next: Ringo or Home" /></td>
     <td><img src="docs/screenshots/rocket-portrait.png" alt="Rocket Launch on a tablet held in portrait" /></td>
   </tr>
   <tr>
-    <td><b>A new planet.</b> Each round unlocks the next planet sticker. Rewards come in a fixed order and are never taken away.</td>
+    <td><b>A new planet, the next stage.</b> 24 stages across 3 galaxies, each galaxy needing a little more fuel. Planets come in a fixed order and are never taken away.</td>
     <td><b>Portrait too.</b> The layout adapts when the tablet is turned.</td>
   </tr>
 </table>
@@ -99,7 +99,7 @@ Behind a simple sum ("What is 7 + 5?") so little ones don't wander in.
   </tr>
   <tr>
     <td><b>Progress per child.</b> Every letter, in capitals and small letters, plus recent activity. "Knows it well" means found on the first try without help, on at least two different days.</td>
-    <td><b>Players.</b> Add, edit or remove children. Each one has their own letters, planets and settings: sound, speech, calmer visuals, a break reminder and letter case.</td>
+    <td><b>Players.</b> Add, edit or remove children. Each one has their own letters, planets and settings: difficulty (Gentle, Normal or Challenge), sound, speech, calmer visuals, a break reminder and letter case.</td>
   </tr>
 </table>
 

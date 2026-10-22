@@ -7,7 +7,8 @@ off to a new planet.
 
 - Night sky with slowly drifting, twinkling stars (parallax, two layers).
 - A friendly rocket on a launch pad, left of centre. Its window shows the guide, Pip.
-- A fuel gauge of **5 cells** beside the rocket.
+- A fuel gauge beside the rocket: **4–8 cells**, set by difficulty and galaxy (see Stages).
+- A stage label in the corner, e.g. "Stage 3 of 24 · Home Galaxy".
 - The **target letter** large, in a glowing bubble above the gauge.
 - The on-screen keyboard along the bottom.
 
@@ -20,11 +21,12 @@ off to a new planet.
    appears. The next letter comes ~1 s later.
 3. **Wrong key:** the rocket does a small curious wobble, a soft low "boop"
    plays, and the pressed key flashes grey on the keyboard. Fuel is **never**
-   removed. After 2 misses the hint gets stronger (see below).
-4. After 5 cells: countdown "3, 2, 1" (spoken), engine flame and smoke
+   removed. After a few misses the hint gets stronger (see below).
+4. With the tank full: countdown "3, 2, 1" (spoken), engine flame and smoke
    particles, the rocket flies up, stars streak past, and a new planet slides in.
 5. The planet becomes a **sticker** in the Collection. Two big buttons:
-   **Fly again** and **Home**.
+   **Next: *planet name* 🚀** (the next stage) and **Home**. After the last planet
+   of a galaxy, the card also says the whole galaxy is explored.
 
 There is no timer, no score, no lives and no speed measurement.
 
@@ -38,14 +40,28 @@ There is no timer, no score, no lives and no speed measurement.
 
 - A key the learner hasn't shown they know starts at level 1.
 - After 3 unassisted first-try successes on a key, it starts at level 0.
-- Within a trial: every 2 misses → one level up. About 8 s of no key presses
-  → one level up (once). Never above 2.
+- Within a trial: every few misses → one level up (1 on Gentle, 2 on Normal,
+  3 on Challenge). A pause with no key presses → one level up, once (5 s, 8 s
+  or 15 s). Never above 2.
 
-## Rewards
+## Stages and difficulty
 
-Planets unlock in a fixed order (Moon, Mars, Ringo, Bubble, Candy, Ice,
-Jungle, Rainbow). Once all are collected, rounds keep awarding bonus stars.
-Rewards are never taken away.
+Each planet is one stage: **24 stages in 3 galaxies** (Home Galaxy, Ocean
+Nebula, Sweet Cluster), each with its own sky colour. Planets unlock in a fixed
+order, one per finished round. After all 24, rounds keep awarding bonus stars.
+Rewards are never taken away. Later galaxies stay hidden in the collection
+until the child reaches them.
+
+A parent sets the difficulty per child in the grown-ups area:
+
+| | Gentle | Normal | Challenge |
+| --- | --- | --- | --- |
+| Fuel cells per round (Home / Ocean / Sweet) | 4 / 5 / 6 | 5 / 6 / 7 | 6 / 7 / 8 |
+| Misses before a stronger hint | 1 | 2 | 3 |
+| Pause before a stronger hint | 5 s | 8 s | 15 s |
+| New letter added when this share of letters is known | 85% | 75% | 60% |
+
+Difficulty only changes pace and help. No setting adds timers, scores or penalties.
 
 ## Learning
 

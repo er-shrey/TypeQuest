@@ -123,6 +123,6 @@ export function startingHint(skill: KeySkill | undefined): number {
 }
 
 /** Hint level after `misses` wrong presses in the current trial. */
-export function hintAfterMisses(start: number, misses: number): number {
-  return Math.min(HINTS.max, start + Math.floor(misses / HINTS.missesPerLevel))
+export function hintAfterMisses(start: number, misses: number, missesPerLevel: number = HINTS.missesPerLevel): number {
+  return Math.min(HINTS.max, start + Math.floor(misses / missesPerLevel))
 }
