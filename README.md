@@ -23,7 +23,7 @@
 **[Latest release](https://github.com/er-shrey/TypeQuest/releases/latest)**, or the direct link to the current build:
 
 ```
-https://github.com/er-shrey/TypeQuest/releases/download/v0.2.0/TypeQuest-0.2.0.apk
+https://github.com/er-shrey/TypeQuest/releases/download/v0.3.0/TypeQuest-0.3.0.apk
 ```
 
 Open the link on the tablet and tap the downloaded file. Android asks two one-time questions for apps from outside the Play Store: allow installs from your browser (or file manager), then tap past the Play Protect "unknown developer" warning (**More details → Install anyway**). Connect a physical keyboard and you're ready.
@@ -31,7 +31,7 @@ Open the link on the tablet and tap the downloaded file. Android asks two one-ti
 Or install from a computer over USB, with USB debugging on:
 
 ```bash
-adb install -r TypeQuest-0.2.0.apk
+adb install -r TypeQuest-0.3.0.apk
 ```
 
 TypeQuest asks for no permissions at all, not even internet access.

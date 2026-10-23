@@ -115,6 +115,11 @@ async function open(viewport, data) {
   const page = await browser.newPage()
   await page.setViewport(viewport)
   await page.evaluateOnNewDocument((d) => {
+    // Screenshot the installed app, as on the tablet: it shows the Quit button,
+    // which an ordinary browser tab hides because a tab can't close itself.
+    const realMatchMedia = window.matchMedia.bind(window)
+    window.matchMedia = (q) =>
+      q.includes('display-mode') ? { matches: true, media: q, onchange: null, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {}, dispatchEvent: () => false } : realMatchMedia(q)
     if (d && !sessionStorage.getItem('seeded')) {
       localStorage.setItem('typequest:v1', d)
       sessionStorage.setItem('seeded', '1')
