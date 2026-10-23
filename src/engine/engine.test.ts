@@ -3,7 +3,7 @@ import { displayLetter, letterFromKey, skillId } from './letters'
 import { emptySkill, hintAfterMisses, masteryState, recordTrial, startingHint, type KeySkill } from './skills'
 import { activeLetters, advance, newProgress, pickTarget, type LearnerProgress } from './targets'
 import { awardRound, currentStage, GALAXIES, PLANETS } from './rewards'
-import { cellsPerRound, DIFFICULTY } from './config'
+import { cellsPerRound, DIFFICULTY, minLettersByStage } from './config'
 
 const DAY = 24 * 60 * 60 * 1000
 const T0 = new Date(2026, 9, 1, 10).getTime()
@@ -118,6 +118,26 @@ describe('targets', () => {
     expect(result.progress.poolSize.upper).toBe(5)
   })
 
+  it('keeps a minimum pace so every letter, Q included, arrives by about stage 22', () => {
+    let p: LearnerProgress = newProgress('explorer')
+    // A child who never quite masters anything still meets a new letter each stage on Normal.
+    for (let stage = 1; stage <= 22; stage++) p = advance(p, { minUpper: minLettersByStage('explorer', 'normal', stage) }).progress
+    expect(p.poolSize.upper).toBe(26)
+    expect(activeLetters(p, 'upper')).toContain('Q')
+  })
+
+  it('catches a child up at most two letters per round', () => {
+    const behind: LearnerProgress = { ...newProgress('explorer'), poolSize: { upper: 12, lower: 4 } }
+    const r = advance(behind, { minUpper: minLettersByStage('explorer', 'normal', 24) })
+    expect(r.newLetters).toHaveLength(2)
+    expect(r.progress.poolSize.upper).toBe(14)
+  })
+
+  it('goes at half pace on Gentle', () => {
+    expect(minLettersByStage('explorer', 'gentle', 10)).toBe(9)
+    expect(minLettersByStage('explorer', 'normal', 10)).toBe(14)
+  })
+
   it('moves from uppercase to lowercase after ten mastered letters', () => {
     let p: LearnerProgress = { ...newProgress('explorer'), poolSize: { upper: 26, lower: 4 } }
     for (const letter of activeLetters(p, 'upper').slice(0, 10)) {
@@ -134,7 +154,7 @@ describe('targets', () => {
 describe('rewards and stages', () => {
   it('unlocks every stage in a fixed order across galaxies, then bonus stars', () => {
     let rewards = { planets: [] as string[], bonusStars: 0 }
-    expect(PLANETS).toHaveLength(24)
+    expect(PLANETS).toHaveLength(600)
     PLANETS.forEach((planet, i) => {
       expect(currentStage(rewards)).toMatchObject({ stage: i + 1, planet, allDone: false })
       const r = awardRound(rewards)
@@ -153,7 +173,24 @@ describe('rewards and stages', () => {
       if (r.reward.kind === 'planet' && r.reward.galaxyComplete) done.push(`${i + 1}:${r.reward.galaxyComplete.id}`)
       rewards = r.rewards
     }
-    expect(done).toEqual(GALAXIES.map((g, i) => `${(i + 1) * 8}:${g.id}`))
+    let end = 0
+    expect(done).toEqual(GALAXIES.map((g) => `${(end += g.planets.length)}:${g.id}`))
+  })
+
+  it('generates 600 distinct, repeatable levels after the 24 hand-made ones', () => {
+    expect(GALAXIES).toHaveLength(27)
+    expect(GALAXIES.slice(0, 3).map((g) => g.planets.length)).toEqual([8, 8, 8])
+    expect(GALAXIES.slice(3).every((g) => g.planets.length === 24)).toBe(true)
+    expect(new Set(PLANETS.map((p) => p.id)).size).toBe(600)
+    expect(new Set(PLANETS.map((p) => p.name)).size).toBe(600)
+    // Existing players keep their place: the first 24 stages are unchanged.
+    expect(PLANETS.slice(0, 3).map((p) => p.id)).toEqual(['moon', 'mars', 'ringo'])
+    expect(PLANETS[24]).toMatchObject({ id: 'g4-1', name: 'Beldobo' })
+  })
+
+  it('caps the rocket at 8 fuel cells however far a child gets', () => {
+    expect(cellsPerRound('normal', 26)).toBe(8)
+    expect(cellsPerRound('gentle', 26)).toBe(8)
   })
 
   it('asks for one more fuel cell per galaxy, set by difficulty', () => {

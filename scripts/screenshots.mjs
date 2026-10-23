@@ -119,7 +119,7 @@ const target = (page) => page.$eval('.target-letter', (e) => e.textContent.trim(
 const press = (page, key) => page.keyboard.press(key)
 
 async function passGate(page) {
-  await click(page, '.parent-link')
+  await clickText(page, 'Grown-ups')
   await sleep(300)
   const sum = await page.$eval('.gate p', (e) => {
     const [, a, b] = e.textContent.match(/(\d+) \+ (\d+)/)

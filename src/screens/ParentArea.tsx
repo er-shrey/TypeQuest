@@ -111,6 +111,10 @@ function ProgressView({ profile }: { profile: Profile }) {
       <p className="summary">
         Rocket Launch: {stageSummary(profile)} · Difficulty: {DIFFICULTY[profile.settings.difficulty].label}
       </p>
+      <p className="summary">
+        Letters in play: {profile.progress.poolSize[letterCase]} of {INTRO_ORDER.length}
+        {profile.progress.poolSize[letterCase] < INTRO_ORDER.length && ` · next to join: ${letterCase === 'lower' ? INTRO_ORDER[profile.progress.poolSize[letterCase]].toLowerCase() : INTRO_ORDER[profile.progress.poolSize[letterCase]]}`}
+      </p>
       <p className="muted small">"Knows it well" means found on the first try without help, on at least two different days. These are gentle guides, not test scores.</p>
 
       <div className="segmented">

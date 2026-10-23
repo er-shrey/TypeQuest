@@ -8,7 +8,7 @@ off to a new planet.
 - Night sky with slowly drifting, twinkling stars (parallax, two layers).
 - A friendly rocket on a launch pad, left of centre. Its window shows the guide, Pip.
 - A fuel gauge beside the rocket: **4–8 cells**, set by difficulty and galaxy (see Stages).
-- A stage label in the corner, e.g. "Stage 3 of 24 · Home Galaxy".
+- A stage label in the corner, e.g. "Stage 37 of 600 · Dino Drift".
 - The **target letter** large, in a glowing bubble above the gauge.
 - The on-screen keyboard along the bottom.
 
@@ -46,9 +46,13 @@ There is no timer, no score, no lives and no speed measurement.
 
 ## Stages and difficulty
 
-Each planet is one stage: **24 stages in 3 galaxies** (Home Galaxy, Ocean
-Nebula, Sweet Cluster), each with its own sky colour. Planets unlock in a fixed
-order, one per finished round. After all 24, rounds keep awarding bonus stars.
+Each planet is one stage: **600 stages in 27 galaxies**, each with its own sky
+and hill colours. The first three galaxies (Home Galaxy, Ocean Nebula, Sweet
+Cluster, 8 planets each) are drawn by hand. The other 24 galaxies (Comet Coast,
+Dino Drift … Starlight Summit) have 24 planets each, whose names and colours
+come from a seeded generator in `engine/rewards.ts`, so every child gets the
+same planets in the same order. Planets unlock in a fixed order, one per
+finished round. After all 600, rounds keep awarding bonus stars.
 Rewards are never taken away. Later galaxies stay hidden in the collection
 until the child reaches them.
 
@@ -56,11 +60,18 @@ A parent sets the difficulty per child in the grown-ups area:
 
 | | Gentle | Normal | Challenge |
 | --- | --- | --- | --- |
-| Fuel cells per round (Home / Ocean / Sweet) | 4 / 5 / 6 | 5 / 6 / 7 | 6 / 7 / 8 |
+| Fuel cells per round (galaxy 1 / 2 / 3 / 4+) | 4 / 5 / 6 / 7–8 | 5 / 6 / 7 / 8 | 6 / 7 / 8 / 8 |
 | Misses before a stronger hint | 1 | 2 | 3 |
 | Pause before a stronger hint | 5 s | 8 s | 15 s |
 | New letter added when this share of letters is known | 85% | 75% | 60% |
+| …and at least one new capital letter every | 2 stages | stage | stage |
 
+Each galaxy adds one cell until the cap of 8, so rounds stay a few minutes long.
+
+The pace floor makes sure the whole alphabet arrives: starting from 4 letters,
+all 26 (Q is last) are in play by about stage 22 on Normal, even while mastery
+is still building. A child who is behind catches up at most 2 new letters per
+round. New letters always start with their key glowing.
 Difficulty only changes pace and help. No setting adds timers, scores or penalties.
 
 ## Learning

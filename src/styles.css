@@ -672,3 +672,18 @@ input, select { font: inherit; }
 .more-galaxies { font-size: 1.3rem; opacity: 0.8; margin: 0; }
 .difficulty-row { flex-wrap: wrap; }
 .difficulty-row .segmented { margin: 0; }
+
+/* Home: Quit (and Change player) top-left, Grown-ups top-right */
+.corner-actions { position: absolute; top: 16px; right: 16px; display: flex; gap: 10px; }
+.corner-left { position: absolute; top: 16px; left: 16px; display: flex; gap: 10px; align-items: center; }
+.corner-left .switch-player { position: static; }
+.corner-btn {
+  border: 0;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  min-height: 44px;
+}
+.quit-btn { background: rgba(255, 255, 255, 0.92); color: var(--ink); font-weight: 600; min-height: 52px; padding: 10px 18px; font-size: 1.05rem; box-shadow: 0 5px 0 rgba(0, 0, 0, 0.2); }

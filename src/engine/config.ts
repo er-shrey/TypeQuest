@@ -43,6 +43,8 @@ export const DIFFICULTY: Record<Difficulty, {
   missesPerLevel: number
   idleMs: number
   growWhenReady: number
+  /** Pace floor: at least one new capital letter every this many stages. */
+  newLetterEvery: number
 }> = {
   gentle: {
     label: 'Gentle',
@@ -51,6 +53,7 @@ export const DIFFICULTY: Record<Difficulty, {
     missesPerLevel: 1,
     idleMs: 5000,
     growWhenReady: 0.85,
+    newLetterEvery: 2,
   },
   normal: {
     label: 'Normal',
@@ -59,6 +62,7 @@ export const DIFFICULTY: Record<Difficulty, {
     missesPerLevel: HINTS.missesPerLevel,
     idleMs: HINTS.idleMs,
     growWhenReady: POOL.growWhenReady,
+    newLetterEvery: 1,
   },
   challenge: {
     label: 'Challenge',
@@ -67,7 +71,13 @@ export const DIFFICULTY: Record<Difficulty, {
     missesPerLevel: 3,
     idleMs: 15000,
     growWhenReady: 0.6,
+    newLetterEvery: 1,
   },
+}
+
+/** Capital letters a child should have met after `stagesDone` stages, whatever their mastery. */
+export function minLettersByStage(startStage: keyof typeof POOL.startSize, difficulty: Difficulty, stagesDone: number): number {
+  return POOL.startSize[startStage] + Math.floor(stagesDone / DIFFICULTY[difficulty].newLetterEvery)
 }
 
 export const MAX_CELLS = 8

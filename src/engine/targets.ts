@@ -75,20 +75,36 @@ export interface ProgressUpdate {
  * Grows the letter pool when most active letters are known, and moves to the
  * next case stage when enough letters are mastered. Call after each round.
  */
-export function advance(progress: LearnerProgress, growWhenReady: number = POOL.growWhenReady): ProgressUpdate {
+export interface AdvanceOptions {
+  /** Share of active letters that must be known before one more joins. */
+  growWhenReady?: number
+  /**
+   * Minimum number of capital letters in play by now (a pace floor), so the
+   * whole alphabet arrives even while mastery is still building.
+   */
+  minUpper?: number
+}
+
+/** Most letters that may join after one round, so a child catching up isn't flooded. */
+export const MAX_NEW_PER_ROUND = 2
+
+export function advance(progress: LearnerProgress, options: AdvanceOptions = {}): ProgressUpdate {
+  const { growWhenReady = POOL.growWhenReady, minUpper = 0 } = options
   const poolSize = { ...progress.poolSize }
   const newLetters: Target[] = []
 
   for (const letterCase of casesForStage(progress.caseStage)) {
+    const size = poolSize[letterCase]
     const letters = activeLetters(progress, letterCase)
     const known = letters.filter((l) => {
       const state = masteryState(getSkill(progress, l, letterCase))
       return state === 'practicing' || state === 'mastered'
     }).length
-    if (known / letters.length >= growWhenReady && poolSize[letterCase] < INTRO_ORDER.length) {
-      newLetters.push({ letter: INTRO_ORDER[poolSize[letterCase]], letterCase })
-      poolSize[letterCase] += 1
-    }
+    let next = size + (known / letters.length >= growWhenReady ? 1 : 0)
+    if (letterCase === 'upper') next = Math.max(next, Math.min(size + MAX_NEW_PER_ROUND, minUpper))
+    next = Math.min(next, INTRO_ORDER.length)
+    for (let i = size; i < next; i++) newLetters.push({ letter: INTRO_ORDER[i], letterCase })
+    poolSize[letterCase] = next
   }
 
   let newCaseStage: CaseStage | null = null

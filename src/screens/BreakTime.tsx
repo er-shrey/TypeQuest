@@ -1,10 +1,9 @@
-import { App as NativeApp } from '@capacitor/app'
-import { Capacitor } from '@capacitor/core'
 import { useEffect, useState } from 'react'
 import { speak } from '../audio/speech'
 import { sfx } from '../audio/sfx'
 import { Pip } from '../components/Pip'
 import { Screen } from '../components/common'
+import { closeApp } from '../native/closeApp'
 
 /** Shown when the parent's session limit is reached. Warm, never guilt-inducing (PRD FR-020). */
 export function BreakTime({ name, onGrownUp }: { name: string; onGrownUp: () => void }) {
@@ -14,15 +13,9 @@ export function BreakTime({ name, onGrownUp }: { name: string; onGrownUp: () => 
     speak(`Great exploring today, ${name}! Pip is having a little rest.`)
   }, [name])
 
-  const close = () => {
+  const close = async () => {
     sfx.tap()
-    if (Capacitor.isNativePlatform()) {
-      void NativeApp.exitApp()
-      return
-    }
-    // Browsers only let a page close itself in some cases (an installed app, a tab it opened).
-    window.close()
-    setTimeout(() => setCloseBlocked(true), 300)
+    if (!(await closeApp())) setCloseBlocked(true)
   }
 
   return (

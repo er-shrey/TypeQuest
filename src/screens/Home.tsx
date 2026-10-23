@@ -4,6 +4,7 @@ import { sfx, unlockAudio } from '../audio/sfx'
 import { Pip } from '../components/Pip'
 import { PlanetSticker } from '../components/PlanetSticker'
 import { Screen } from '../components/common'
+import { canCloseApp, closeApp } from '../native/closeApp'
 import { currentStage, PLANETS } from '../engine/rewards'
 import type { Profile } from '../storage/store'
 
@@ -28,12 +29,21 @@ export function Home({ profile, onGo, onSwitchPlayer }: { profile: Profile; onGo
 
   return (
     <Screen className="home">
-      <button className="parent-link" onClick={() => go('parent')}>🔒 Grown-ups</button>
-      {onSwitchPlayer && (
-        <button className="switch-player" onClick={() => { sfx.tap(); onSwitchPlayer() }} aria-label="Change player">
-          <span aria-hidden="true">{profile.avatar}</span> Change player
-        </button>
-      )}
+      <div className="corner-left">
+        {canCloseApp() && (
+          <button className="corner-btn quit-btn" onClick={() => { sfx.tap(); void closeApp() }}>
+            👋 Quit
+          </button>
+        )}
+        {onSwitchPlayer && (
+          <button className="switch-player" onClick={() => { sfx.tap(); onSwitchPlayer() }} aria-label="Change player">
+            <span aria-hidden="true">{profile.avatar}</span> Change player
+          </button>
+        )}
+      </div>
+      <div className="corner-actions">
+        <button className="corner-btn" onClick={() => go('parent')}>🔒 Grown-ups</button>
+      </div>
 
       <header className="home-head">
         <Pip mood="happy" size={120} />

@@ -3,6 +3,7 @@ import { speak } from '../audio/speech'
 import { sfx, unlockAudio } from '../audio/sfx'
 import { Pip } from '../components/Pip'
 import { Screen } from '../components/common'
+import { canCloseApp, closeApp } from '../native/closeApp'
 import { profilesInOrder, switchProfile, useAppData } from '../storage/store'
 
 /** "Who's playing?" — big buddies so a child who can't read yet can find their own. */
@@ -23,7 +24,16 @@ export function ProfilePicker({ onPicked, onGrownUps }: { onPicked: () => void; 
 
   return (
     <Screen className="picker">
-      <button className="parent-link" onClick={onGrownUps}>🔒 Grown-ups</button>
+      {canCloseApp() && (
+        <div className="corner-left">
+          <button className="corner-btn quit-btn" onClick={() => { sfx.tap(); void closeApp() }}>
+            👋 Quit
+          </button>
+        </div>
+      )}
+      <div className="corner-actions">
+        <button className="corner-btn" onClick={onGrownUps}>🔒 Grown-ups</button>
+      </div>
       <header className="home-head">
         <Pip mood="happy" size={110} />
         <div className="speech-bubble">Who's playing?</div>

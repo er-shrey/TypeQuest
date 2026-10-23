@@ -6,9 +6,10 @@ const hex = (n: number) => `#${n.toString(16).padStart(6, '0')}`
 export function PlanetSticker({ planet, locked = false, size = 120 }: { planet: Planet; locked?: boolean; size?: number }) {
   const color = locked ? '#3a4573' : hex(planet.color)
   const accent = locked ? '#2b3560' : hex(planet.accent)
+  const tilt = `rotate(${((planet.ringTilt ?? 0) * 180) / Math.PI})`
   return (
     <svg width={size} height={size} viewBox="-80 -80 160 160" role="img" aria-label={locked ? 'A planet still to discover' : planet.name}>
-      {planet.ring && <ellipse cx="0" cy="0" rx="72" ry="19" fill="none" stroke={accent} strokeWidth="6" />}
+      {planet.ring && <ellipse cx="0" cy="0" rx="72" ry="19" fill="none" stroke={accent} strokeWidth="6" transform={tilt} />}
       <circle r="45" fill={color} />
       {locked ? (
         <text y="16" textAnchor="middle" fontSize="44" fontWeight="700" fill="#6b78b0" fontFamily="Fredoka">?</text>
@@ -24,7 +25,7 @@ export function PlanetSticker({ planet, locked = false, size = 120 }: { planet: 
           <circle cx="22" cy="7" r="4.5" fill="#ff7aa8" opacity="0.45" />
         </>
       )}
-      {planet.ring && <path d="M-72 0 a72 19 0 0 0 144 0" fill="none" stroke={accent} strokeWidth="6" />}
+      {planet.ring && <path d="M-72 0 a72 19 0 0 0 144 0" fill="none" stroke={accent} strokeWidth="6" transform={tilt} />}
     </svg>
   )
 }

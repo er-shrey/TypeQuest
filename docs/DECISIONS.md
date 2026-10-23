@@ -89,9 +89,14 @@ exits the app.
 
 ## D9 — Stages, difficulty and the break
 
-- **Stages are planets.** 24 stages in 3 galaxies, each galaxy asking for one
-  more fuel cell, so rounds lengthen gently as a child progresses. The reward
+- **Stages are planets.** 600 stages in 27 galaxies: 3 hand-drawn galaxies of 8,
+  then 24 generated galaxies of 24 (seeded, so the order never changes and
+  saved progress stays valid). Each galaxy asks for one more fuel cell, capped
+  at 8, so rounds lengthen gently as a child progresses. The reward
   button names the next stage ("Next: Ringo") so it never looks like a replay.
+- **Letters keep a minimum pace.** Mastery alone was too slow: a child could
+  finish 24 stages without meeting Q (seen in real use). Now at least one new
+  capital letter joins per stage (every 2 on Gentle), at most 2 per round.
 - **Difficulty is per child** (Gentle, Normal, Challenge) and only changes the
   round length, how quickly hints arrive and how soon new letters join. The
   table is in `engine/config.ts` and in the rocket spec.
@@ -101,3 +106,7 @@ exits the app.
   it). The rest lasts as long as the limit and is saved, so reopening the app
   during it shows the break screen again. A grown-up can end it early through
   the sum gate.
+- **A Quit button, top-left on the home and "Who's playing?" screens**, with no gate:
+  quitting loses nothing, since progress is saved after every letter. It shows
+  in the Android app and in an installed web app; an ordinary browser tab can't
+  close itself, so there the tab's own close button does the job.

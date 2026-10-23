@@ -62,7 +62,7 @@ Find letters to fuel the rocket. Five letters fill the tank, then it's countdown
     <td><img src="docs/screenshots/rocket-portrait.png" alt="Rocket Launch on a tablet held in portrait" /></td>
   </tr>
   <tr>
-    <td><b>A new planet, the next stage.</b> 24 stages across 3 galaxies, each galaxy needing a little more fuel. Planets come in a fixed order and are never taken away.</td>
+    <td><b>A new planet, the next stage.</b> 600 stages across 27 galaxies, each galaxy needing a little more fuel. Planets come in a fixed order and are never taken away.</td>
     <td><b>Portrait too.</b> The layout adapts when the tablet is turned.</td>
   </tr>
 </table>
@@ -83,7 +83,7 @@ Find letters to fuel the rocket. Five letters fill the tank, then it's countdown
     <td><img src="docs/screenshots/collection.png" alt="My Planets: Moon, Mars, Ringo and Bubble collected, four still to discover" /></td>
   </tr>
   <tr>
-    <td><b>Home.</b> Three big choices and the next planet to fly to.</td>
+    <td><b>Home.</b> Three big choices and the next planet to fly to. In the tablet app, a Quit button closes TypeQuest.</td>
     <td><b>My Planets.</b> The sticker collection, with the planets still to discover.</td>
   </tr>
 </table>

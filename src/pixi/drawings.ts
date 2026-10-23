@@ -81,7 +81,20 @@ export function drawRocket(): RocketParts {
 export function drawPlanet(planet: Planet, r: number): Container {
   const c = new Container()
   const g = new Graphics()
-  if (planet.ring) g.ellipse(0, 0, r * 1.6, r * 0.42).stroke({ width: r * 0.12, color: planet.accent, alpha: 0.9 })
+  const ring = (front: boolean) => {
+    // Drawn in a tilted container; the front half is masked so it passes over the planet.
+    const tilt = new Container()
+    tilt.rotation = planet.ringTilt ?? 0
+    const band = new Graphics().ellipse(0, 0, r * 1.6, r * 0.42).stroke({ width: r * 0.12, color: planet.accent, alpha: 0.9 })
+    tilt.addChild(band)
+    if (front) {
+      const mask = new Graphics().rect(-r * 2, 0, r * 4, r).fill(0xffffff)
+      tilt.addChild(mask)
+      band.mask = mask
+    }
+    return tilt
+  }
+  if (planet.ring) c.addChild(ring(false))
   g.circle(0, 0, r).fill(planet.color)
   g.circle(-r * 0.45, r * 0.35, r * 0.16).fill({ color: planet.accent, alpha: 0.55 })
   g.circle(r * 0.5, -r * 0.4, r * 0.11).fill({ color: planet.accent, alpha: 0.55 })
@@ -96,17 +109,8 @@ export function drawPlanet(planet: Planet, r: number): Container {
   g.arc(0, r * 0.12, r * 0.2, 0.25, Math.PI - 0.25).stroke({ width: r * 0.06, color: 0x1d2440, cap: 'round' })
   g.circle(-r * 0.48, r * 0.15, r * 0.1).fill({ color: 0xff7aa8, alpha: 0.45 })
   g.circle(r * 0.48, r * 0.15, r * 0.1).fill({ color: 0xff7aa8, alpha: 0.45 })
-  if (planet.ring) {
-    // Front half of the ring passes over the planet.
-    const front = new Graphics()
-      .ellipse(0, 0, r * 1.6, r * 0.42)
-      .stroke({ width: r * 0.12, color: planet.accent, alpha: 0.9 })
-    const mask = new Graphics().rect(-r * 2, 0, r * 4, r).fill(0xffffff)
-    front.mask = mask
-    c.addChild(g, front, mask)
-  } else {
-    c.addChild(g)
-  }
+  c.addChild(g)
+  if (planet.ring) c.addChild(ring(true))
   return c
 }
 

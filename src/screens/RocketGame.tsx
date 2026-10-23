@@ -4,7 +4,7 @@ import { sfx } from '../audio/sfx'
 import { HomeButton } from '../components/common'
 import { OnScreenKeyboard } from '../components/OnScreenKeyboard'
 import { Pip, type PipMood } from '../components/Pip'
-import { cellsPerRound, DIFFICULTY, HINTS } from '../engine/config'
+import { cellsPerRound, DIFFICULTY, HINTS, minLettersByStage } from '../engine/config'
 import { displayLetter } from '../engine/letters'
 import { awardRound, currentStage, galaxyOf, GALAXIES, nextPlanet, type RoundReward } from '../engine/rewards'
 import { hintAfterMisses, recordTrial, startingHint } from '../engine/skills'
@@ -158,7 +158,10 @@ export function RocketGame({ profile, onHome, active, breakDue, onBreak }: {
     let end: RoundEnd | null = null
     updateProfile((p) => {
       const { rewards, reward } = awardRound(p.rewards)
-      const update = advance(p.progress, DIFFICULTY[p.settings.difficulty].growWhenReady)
+      const update = advance(p.progress, {
+        growWhenReady: DIFFICULTY[p.settings.difficulty].growWhenReady,
+        minUpper: minLettersByStage(p.startStage, p.settings.difficulty, rewards.planets.length),
+      })
       end = { reward, newLetters: update.newLetters }
       return { ...p, rewards, progress: update.progress, rocketCells: 0 }
     })
@@ -274,7 +277,7 @@ export function RocketGame({ profile, onHome, active, breakDue, onBreak }: {
             </p>
             {roundEnd!.newLetters.length > 0 && (
               <p className="new-letter">
-                New letter to discover: <strong>{roundEnd!.newLetters.map((t) => displayLetter(t.letter, t.letterCase)).join(' ')}</strong>
+                {roundEnd!.newLetters.length > 1 ? 'New letters' : 'New letter'} to discover: <strong>{roundEnd!.newLetters.map((t) => displayLetter(t.letter, t.letterCase)).join(' ')}</strong>
               </p>
             )}
             <div className="reward-actions">
