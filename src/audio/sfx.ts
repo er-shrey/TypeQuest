@@ -103,6 +103,18 @@ export const sfx = {
     noise(0, 0.5, 0.5, 3000, 400)
     tone(1200, 0, 0.3, 'sine', 0.2, 600)
   },
+  /** Word Train: a soft steam puff for each right letter, pitched up along the word. */
+  chuff(index: number) {
+    noise(0, 0.18, 0.5, 900, 300)
+    tone(PENTATONIC[Math.min(index, PENTATONIC.length - 1)], 0.02, 0.2, 'triangle', 0.45)
+  },
+  /** Word Train: a friendly two-note whistle when a word is done. */
+  toot() {
+    tone(587.33, 0, 0.32, 'square', 0.18)
+    tone(783.99, 0, 0.32, 'triangle', 0.35)
+    tone(587.33, 0.38, 0.45, 'square', 0.18)
+    tone(783.99, 0.38, 0.45, 'triangle', 0.35)
+  },
   tap() {
     tone(700, 0, 0.08, 'sine', 0.4, 900)
   },

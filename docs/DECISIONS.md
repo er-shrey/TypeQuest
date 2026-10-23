@@ -110,3 +110,22 @@ exits the app.
   quitting loses nothing, since progress is saved after every letter. It shows
   in the Android app and in an installed web app; an ordinary browser tab can't
   close itself, so there the tab's own close button does the job.
+
+## D10 — Word Train teaching choices
+
+- **Second game, unlocked at 8 letters.** Rocket teaches finding a key; the
+  train teaches typing keys in order, so it opens once a child has enough
+  letters to make words. The home screen now says "Let's play!" with both games.
+- **Pictures with every word**, and only concrete, picturable words, so the
+  word is tied to a meaning (recognition, not just letter order).
+- **See it → Remember it.** New words show every letter; after 2 completions
+  only the first letter is shown and the child spells from memory, with hints
+  that bring the letters back step by step. Hard words return to "See it".
+- **Rhyme families** for 3-letter words (cat, hat, bat), then blends, digraphs,
+  double letters and magic e on the 4-letter line, then 5-letter words.
+- **Spaced review:** at most 2 new words per station; the rest are earlier
+  words, tricky or not-yet-known ones first.
+- **100 stations** in 4 lines (10 + 30 + 30 + 30). More words can be added to
+  `engine/words.ts` without changing anything else.
+- **Letters typed on the train count for Rocket's letter skills too.**
+

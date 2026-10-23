@@ -57,7 +57,7 @@ function player(id, name, avatar, startStage, extra = {}) {
 const mia = player('mia', 'Mia', '🦊', 'explorer', {
   progress: {
     caseStage: 'upper',
-    poolSize: { upper: 6, lower: 4 },
+    poolSize: { upper: 12, lower: 4 },
     skills: Object.fromEntries(
       [
         skill('A', { successes: 14, unassisted: 9, days: 3, misses: 1, ago: 2 * 60e3 }),
@@ -70,6 +70,7 @@ const mia = player('mia', 'Mia', '🦊', 'explorer', {
     ),
   },
   rewards: { planets: ['moon', 'mars', 'ringo'], bonusStars: 0 },
+  train: trainSeed(),
   activity: [
     { at: now - 60e3, kind: 'rocket', summary: 'Rocket round finished — reached Ringo' },
     { at: now - 9 * 60e3, kind: 'explore', summary: 'Explored 14 different keys' },
@@ -77,6 +78,23 @@ const mia = player('mia', 'Mia', '🦊', 'explorer', {
     { at: now - 2 * DAY, kind: 'rocket', summary: 'Rocket round finished — reached Moon' },
   ],
 })
+// Word Train: the Little Line done, a few Rhyme Railway words met, CAT ready to spell from memory.
+function trainSeed() {
+  const met = (word, shown, recalled = 0, daysAgo = 1) => [word, {
+    word, firstSeenAt: now - 5 * DAY, shown, recalled,
+    recallDays: Array.from({ length: Math.min(recalled, 2) }, (_, i) => new Date(now - (i + 1) * DAY).toISOString().slice(0, 10)),
+    misses: word === 'HAT' ? 4 : 0, lastAt: now - daysAgo * DAY,
+  }]
+  return {
+    stationsDone: 12,
+    words: Object.fromEntries([
+      ...['UP', 'GO', 'HI', 'OX', 'NO', 'ME', 'WE', 'ON', 'OK', 'OH'].map((w) => met(w, 2, 2, 2)),
+      met('CAT', 2), met('HAT', 2), met('BAT', 1), met('RAT', 1), met('VAN', 1), met('PAN', 1),
+    ]),
+    current: { words: ['MAN', 'CAT', 'CAN'], index: 0, fresh: ['MAN', 'CAN'] },
+  }
+}
+
 const leo = player('leo', 'Leo', '🐼', 'adventurer', { progress: { caseStage: 'upper', poolSize: { upper: 8, lower: 8 }, skills: {} } })
 
 const seed = (activeProfileId, profiles) => JSON.stringify({ version: 1, activeProfileId, profiles: Object.fromEntries(profiles.map((p) => [p.id, p])) })
@@ -213,6 +231,38 @@ try {
   await clickText(page, 'Players (')
   await sleep(400)
   await shot(page, 'parent-players')
+  await page.close()
+
+  // Word Train: a new word (see it), then one spelled from memory, then the station
+  page = await open(LANDSCAPE, seed('mia', [mia]))
+  await click(page, '.card-train')
+  await sleep(2300)
+  await shot(page, 'train-see')
+  await press(page, 'm')
+  await sleep(350)
+  await shot(page, 'train-fill')
+  await press(page, 'a')
+  await sleep(400)
+  await press(page, 'n')
+  // Spelling aloud, driving off and the next train rolling in take about 5 s.
+  await sleep(6200)
+  await shot(page, 'train-remember')
+  await press(page, 'c')
+  await sleep(400)
+  await press(page, 'z')
+  await sleep(500)
+  await shot(page, 'train-clue')
+  for (const k of ['a', 't']) { await press(page, k); await sleep(400) }
+  await sleep(6200)
+  for (const k of ['c', 'a', 'n']) { await press(page, k); await sleep(400) }
+  await sleep(6500)
+  await shot(page, 'train-station')
+  await clickText(page, 'Home')
+  await sleep(500)
+  await shot(page, 'home')
+  await click(page, '.card-words')
+  await sleep(900)
+  await shot(page, 'word-book', true)
   await page.close()
 
   // Portrait tablet

@@ -45,6 +45,10 @@ export const DIFFICULTY: Record<Difficulty, {
   growWhenReady: number
   /** Pace floor: at least one new capital letter every this many stages. */
   newLetterEvery: number
+  /** Word Train: words per station. */
+  trainWords: number
+  /** Word Train: "See it" completions before a word is spelled from memory. */
+  rememberAfter: number
 }> = {
   gentle: {
     label: 'Gentle',
@@ -54,6 +58,8 @@ export const DIFFICULTY: Record<Difficulty, {
     idleMs: 5000,
     growWhenReady: 0.85,
     newLetterEvery: 2,
+    trainWords: 2,
+    rememberAfter: 3,
   },
   normal: {
     label: 'Normal',
@@ -63,6 +69,8 @@ export const DIFFICULTY: Record<Difficulty, {
     idleMs: HINTS.idleMs,
     growWhenReady: POOL.growWhenReady,
     newLetterEvery: 1,
+    trainWords: 3,
+    rememberAfter: 2,
   },
   challenge: {
     label: 'Challenge',
@@ -72,6 +80,8 @@ export const DIFFICULTY: Record<Difficulty, {
     idleMs: 15000,
     growWhenReady: 0.6,
     newLetterEvery: 1,
+    trainWords: 4,
+    rememberAfter: 1,
   },
 }
 
@@ -79,6 +89,9 @@ export const DIFFICULTY: Record<Difficulty, {
 export function minLettersByStage(startStage: keyof typeof POOL.startSize, difficulty: Difficulty, stagesDone: number): number {
   return POOL.startSize[startStage] + Math.floor(stagesDone / DIFFICULTY[difficulty].newLetterEvery)
 }
+
+/** Word Train opens once a child has this many letters in play from Rocket Launch. */
+export const WORD_TRAIN_UNLOCK_LETTERS = 8
 
 export const MAX_CELLS = 8
 

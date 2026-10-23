@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { PlayerForm } from '../components/PlayerForm'
 import { cellsPerRound, DIFFICULTY, type Difficulty } from '../engine/config'
 import { currentStage } from '../engine/rewards'
+import { isKnown, lineForStation, TOTAL_STATIONS } from '../engine/words'
 import { INTRO_ORDER, type CaseStage, type LetterCase } from '../engine/letters'
 import { masteryState, recentAccuracy, type MasteryState } from '../engine/skills'
 import { getSkill } from '../engine/targets'
@@ -38,6 +39,24 @@ const STAGE_LABEL = { explorer: 'Keyboard Explorer', adventurer: 'Letter Adventu
 function stageSummary(profile: Profile) {
   const s = currentStage(profile.rewards)
   return s.allDone ? `all ${s.total} stages done, collecting bonus stars` : `stage ${s.stage} of ${s.total} (${s.galaxy.name})`
+}
+
+function trainSummary(profile: Profile) {
+  const t = profile.train
+  const met = Object.values(t.words)
+  if (!met.length) return 'not started yet'
+  const station = t.stationsDone + 1
+  const where = station > TOTAL_STATIONS ? 'all stations done' : `station ${station} of ${TOTAL_STATIONS} (${lineForStation(station).line.name})`
+  return `${where} · ${met.length} words met · ${met.filter(isKnown).length} spelled from memory`
+}
+
+/** Words with the most misses so far, to practise away from the screen too. */
+function trickyWords(profile: Profile) {
+  return Object.values(profile.train.words)
+    .filter((s) => s.misses >= 3 && !isKnown(s))
+    .sort((a, b) => b.misses - a.misses)
+    .slice(0, 6)
+    .map((s) => s.word.toLowerCase())
 }
 
 function formatAgo(at: number | null) {
@@ -115,6 +134,10 @@ function ProgressView({ profile }: { profile: Profile }) {
         Letters in play: {profile.progress.poolSize[letterCase]} of {INTRO_ORDER.length}
         {profile.progress.poolSize[letterCase] < INTRO_ORDER.length && ` · next to join: ${letterCase === 'lower' ? INTRO_ORDER[profile.progress.poolSize[letterCase]].toLowerCase() : INTRO_ORDER[profile.progress.poolSize[letterCase]]}`}
       </p>
+      <p className="summary">Word Train: {trainSummary(profile)}</p>
+      {trickyWords(profile).length > 0 && (
+        <p className="muted small">Words to practise together: {trickyWords(profile).join(', ')}</p>
+      )}
       <p className="muted small">"Knows it well" means found on the first try without help, on at least two different days. These are gentle guides, not test scores.</p>
 
       <div className="segmented">

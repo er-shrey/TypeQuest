@@ -67,6 +67,34 @@ Find letters to fuel the rocket. Five letters fill the tank, then it's countdown
   </tr>
 </table>
 
+## Word Train
+
+The second game, for children who have met 8 letters. Each word rides in on a train, one letter per carriage, with a picture to say what it means. Type the letters in order and the train chugs off; every few words it reaches a station.
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/train-see.png" alt="A new word, MAN, with a picture; every letter shows on the carriages and the first one glows" /></td>
+    <td width="50%"><img src="docs/screenshots/train-remember.png" alt="Spelling CAT from memory: a cat picture, the first letter C showing and two blank carriages" /></td>
+  </tr>
+  <tr>
+    <td><b>See it.</b> New words show every letter, with a picture and the word spoken aloud.</td>
+    <td><b>Remember it.</b> After typing a word twice, the child spells it from memory, with the picture and first letter as cues.</td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/train-clue.png" alt="A wrong key brings back the hidden letter faintly, with Pip saying here's a little clue" /></td>
+    <td><img src="docs/screenshots/train-station.png" alt="A station with its new words shown as picture cards for the Word Book" /></td>
+  </tr>
+  <tr>
+    <td><b>Never stuck.</b> A wrong key or a pause brings the letter back faintly, then its key glows. A word that stays hard goes back to "See it".</td>
+    <td><b>Stations.</b> 100 stations on 4 lines: 2-letter words, then 3-letter rhyme families (cat, hat, bat), 4-letter words, and 5-letter words. New words go into the Word Book.</td>
+  </tr>
+</table>
+
+<p align="center">
+  <img src="docs/screenshots/word-book.png" width="600" alt="The Word Book: word cards with pictures, gold stars on words known by heart" /><br />
+  <sub>The Word Book: every word met, with its picture. Tap a word to hear it spelled. A gold star means it was spelled from memory on two different days.</sub>
+</p>
+
 ## Explore, players and stickers
 
 <table>
@@ -83,7 +111,7 @@ Find letters to fuel the rocket. Five letters fill the tank, then it's countdown
     <td><img src="docs/screenshots/collection.png" alt="My Planets: Moon, Mars, Ringo and Bubble collected, four still to discover" /></td>
   </tr>
   <tr>
-    <td><b>Home.</b> Three big choices and the next planet to fly to. In the tablet app, a Quit button closes TypeQuest.</td>
+    <td><b>Home.</b> "Let's play!" with both games, plus Explore, My Planets and My Words. In the tablet app, a Quit button sits top-left.</td>
     <td><b>My Planets.</b> The sticker collection, with the planets still to discover.</td>
   </tr>
 </table>
@@ -179,6 +207,7 @@ After changing web code, run `npm run android:sync` to copy the new build into t
 - [docs/PRD.md](docs/PRD.md): product requirements, the source of truth
 - [docs/DECISIONS.md](docs/DECISIONS.md): choices the PRD left open (stack, letter case, audio, storage, parent gate)
 - [docs/ROCKET_GAME_SPEC.md](docs/ROCKET_GAME_SPEC.md): the first mini-game and its hint ladder
+- [docs/TRAIN_GAME_SPEC.md](docs/TRAIN_GAME_SPEC.md): Word Train, its lines, and how it teaches spelling
 
 ## Project layout
 

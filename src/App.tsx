@@ -14,9 +14,11 @@ import { ParentArea, type ParentTab } from './screens/ParentArea'
 import { ParentGate } from './screens/ParentGate'
 import { ProfilePicker } from './screens/ProfilePicker'
 import { RocketGame } from './screens/RocketGame'
+import { TrainGame } from './screens/TrainGame'
+import { WordBook } from './screens/WordBook'
 import { getData, updateProfile, useAppData, useProfile } from './storage/store'
 
-type ScreenName = 'home' | 'rocket' | 'explore' | 'collection' | 'parent'
+type ScreenName = 'home' | 'rocket' | 'train' | 'explore' | 'collection' | 'words' | 'parent'
 type GateFor = 'parent' | 'continue' | null
 
 /** Keeps the tablet screen on while a game is open. */
@@ -95,7 +97,7 @@ export default function App() {
     }
   }, [])
 
-  const inGame = screen === 'rocket' || screen === 'explore'
+  const inGame = screen === 'rocket' || screen === 'train' || screen === 'explore'
   useWakeLock(inGame && !!profile)
 
   if (!profile) return <Onboarding onDone={() => setScreen('home')} />
@@ -124,7 +126,7 @@ export default function App() {
     setGate(null)
   }
 
-  const showBreak = breakDue && (screen === 'home' || screen === 'explore' || screen === 'collection')
+  const showBreak = breakDue && (screen === 'home' || screen === 'explore' || screen === 'collection' || screen === 'words')
   const active = !focusLost && gate === null
 
   return (
@@ -137,6 +139,10 @@ export default function App() {
         <BreakTime name={profile.name} onGrownUp={() => setGate('continue')} />
       ) : screen === 'rocket' ? (
         <RocketGame profile={profile} onHome={goHome} active={active} breakDue={breakDue} onBreak={goHome} />
+      ) : screen === 'train' ? (
+        <TrainGame profile={profile} onHome={goHome} active={active} breakDue={breakDue} onBreak={goHome} />
+      ) : screen === 'words' ? (
+        <WordBook profile={profile} onHome={goHome} />
       ) : screen === 'explore' ? (
         <Explore profile={profile} onHome={goHome} active={active} />
       ) : screen === 'collection' ? (

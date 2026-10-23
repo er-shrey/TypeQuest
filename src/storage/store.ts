@@ -2,6 +2,7 @@ import { useSyncExternalStore } from 'react'
 import { POOL, type Difficulty } from '../engine/config'
 import { newProgress, type LearnerProgress } from '../engine/targets'
 import type { Rewards } from '../engine/rewards'
+import { newTrainProgress, type TrainProgress } from '../engine/words'
 
 export type StartStage = 'explorer' | 'adventurer'
 
@@ -16,7 +17,7 @@ export interface Settings {
 
 export interface ActivityEntry {
   at: number
-  kind: 'rocket' | 'explore'
+  kind: 'rocket' | 'explore' | 'train'
   summary: string
 }
 
@@ -34,6 +35,7 @@ export interface Profile {
   rocketCells: number
   /** After a session limit: rest until this time, so closing and reopening doesn't skip the break. */
   restUntil?: number
+  train: TrainProgress
 }
 
 export interface AppData {
@@ -57,7 +59,10 @@ function read(): AppData {
     if (!raw) return emptyData()
     const parsed = JSON.parse(raw) as AppData
     if (parsed?.version !== 1 || typeof parsed.profiles !== 'object') return emptyData()
-    for (const p of Object.values(parsed.profiles)) p.settings = { ...DEFAULT_SETTINGS, ...p.settings }
+    for (const p of Object.values(parsed.profiles)) {
+      p.settings = { ...DEFAULT_SETTINGS, ...p.settings }
+      p.train ??= newTrainProgress()
+    }
     return parsed
   } catch {
     return emptyData()
@@ -131,6 +136,7 @@ export function createProfile({ name, avatar, startStage }: ProfileDetails): Pro
     rewards: { planets: [], bonusStars: 0 },
     activity: [],
     rocketCells: 0,
+    train: newTrainProgress(),
   }
   // Adding a second player from the grown-ups area doesn't switch who is playing.
   update((d) => ({ ...d, activeProfileId: d.activeProfileId ?? profile.id, profiles: { ...d.profiles, [profile.id]: profile } }))
@@ -145,6 +151,7 @@ export function resetProgress(id: string) {
     rewards: { planets: [], bonusStars: 0 },
     activity: [],
     rocketCells: 0,
+    train: newTrainProgress(),
   }))
 }
 
